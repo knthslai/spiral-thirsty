@@ -11,12 +11,9 @@ import { hasDrinks } from "@/types/cocktail";
  * 2. Response structure is correct
  * 3. Edge cases are handled properly
  * 4. Type guards work correctly
- *
- * NOTE: These tests are skipped to avoid pinging the external API.
- * Remove .skip to re-enable when needed.
  */
 
-describe.skip("API Integration Tests", () => {
+describe("API Integration Tests", () => {
   describe("searchDrinks", () => {
     it("should return drinks array for valid search query", async () => {
       const result = await searchDrinks("margarita");

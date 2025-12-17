@@ -4,6 +4,21 @@ This directory contains detailed documentation of the planning steps, decisions,
 
 ## Documents
 
+0. **[00-coding-challenge-spec.md](./00-coding-challenge-spec.md)**
+   - Official Spiral Coding Challenge specification
+   - Application requirements
+   - UI specifications for search and details screens
+   - API reference and ingredient handling requirements
+   - Design philosophy
+
+0. **[00-project-plan.md](./00-project-plan.md)**
+   - Execution plan aligned with Spiral's frontend standards
+   - Proposed tech stack
+   - Application structure
+   - Data model and normalization strategy
+   - State management approach
+   - Testing strategy
+
 1. **[01-initial-setup.md](./01-initial-setup.md)**
    - Project initialization
    - Package manager selection (Bun)
@@ -27,6 +42,13 @@ This directory contains detailed documentation of the planning steps, decisions,
    - Git configuration
    - Initial commit details
    - Repository structure
+
+5. **[05-api-integration.md](./05-api-integration.md)**
+   - API endpoint testing and verification
+   - TypeScript type models (raw API types and normalized app types)
+   - API integration layer implementation
+   - TypeScript configuration updates
+   - Reasoning for type-first approach
 
 ## Purpose
 

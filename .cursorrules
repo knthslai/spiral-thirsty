@@ -13,6 +13,11 @@
 - Optimize for **readability, maintainability, and reviewability**.
 - Avoid speculative features or premature optimization.
 - Treat this as **production-quality frontend code**, not a demo.
+- Focus on **functionality over pixel-perfect design**.
+- **Clean, readable code is more important than visual polish**.
+- **Prioritize working features over perfect styling**.
+- Make **pragmatic architectural decisions** that balance simplicity and maintainability.
+- Handle edge cases gracefully without over-engineering.
 
 ---
 
@@ -187,10 +192,56 @@ Cursor MUST generate a README that includes:
 
 Before generating or modifying code, Cursor must:
 
-- Check for existing implementations first
-- Extend existing utilities instead of duplicating logic
-- Avoid unused code or speculative helpers
-- Ensure the project builds without errors
+- **ALWAYS check for existing implementations first** - Search the codebase for similar functionality before creating new code
+- **Extend existing utilities instead of duplicating logic** - Reuse and extend rather than recreate
+- **Avoid unused code or speculative helpers** - Only create what is needed
+- **Ensure the project builds without errors** - Verify compilation before completing
+- Write code that is **defensible during a lead engineer review**
+- Make decisions that can be **explained and justified** if questioned
+- Structure code to be **copyable, extensible, and maintainable**
+
+---
+
+## 13a. DRY (Don't Repeat Yourself) Principles
+
+Cursor MUST follow DRY principles:
+
+- **Component Reusability**: Before creating a new component, check if an existing component can be extended or reused
+- **Utility Functions**: Extract repeated logic into shared utility functions in `lib/`
+- **Shared Types**: Use existing type definitions from `types/` instead of redefining
+- **Hook Reusability**: Create reusable hooks in `hooks/` for shared state or data fetching patterns
+- **Avoid Duplication**: If similar code exists in multiple places, refactor into a shared utility or component
+- **Composition Over Duplication**: Compose existing components rather than copying their implementation
+
+When creating components:
+- Check `src/components/` for similar components first
+- If a component shares >50% logic with an existing one, consider extending or composing it
+- Extract common patterns into base components or utilities
+- Use props and composition to handle variations, not code duplication
+
+---
+
+## 13b. Folder Structure Philosophy
+
+Cursor MUST respect the established folder structure:
+
+- **Follow the defined structure** in section 3 unless explicitly instructed otherwise
+- **Place files in their designated directories**:
+  - Components → `src/components/`
+  - Hooks → `src/hooks/`
+  - Utilities → `src/lib/`
+  - Types → `src/types/`
+  - Pages → `src/app/`
+  - Tests → `src/tests/` or `tests/`
+- **Do NOT create new top-level directories** without explicit instruction
+- **Do NOT mix concerns** - Keep components, utilities, and types separate
+- **Use consistent naming conventions**:
+  - Components: PascalCase (e.g., `DrinkListItem.tsx`)
+  - Hooks: camelCase with `use` prefix (e.g., `useDrinkSearch.ts`)
+  - Utilities: camelCase (e.g., `ingredientUtils.ts`)
+  - Types: camelCase (e.g., `cocktail.ts`)
+- **Group related files** - Keep related functionality together
+- **Avoid deep nesting** - Prefer flat structures where possible (max 2-3 levels deep)
 
 ---
 
@@ -204,7 +255,18 @@ Cursor should favor:
 
 ---
 
-## 15. Final Priority Order
+## 15. Architectural Philosophy
+
+- **Separation of Concerns**: Clear boundaries between API layer, data normalization, UI components, and business logic.
+- **Testability**: Structure code to be easily testable, especially pure functions and utilities.
+- **Composability**: Build small, focused components that can be composed together.
+- **Data Normalization**: Thoughtfully normalize API data early in the data flow, not in components.
+- **Pragmatic Decisions**: Choose solutions that are maintainable and reviewable, not necessarily the most clever.
+- **Graceful Degradation**: Handle missing or malformed data without crashing, but don't overbuild error handling.
+
+---
+
+## 16. Final Priority Order
 
 1. Correctness vs PDF spec
 2. Clean architecture

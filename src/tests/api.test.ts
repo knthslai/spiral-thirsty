@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { searchDrinks, getDrinkById, getFirstDrink } from '@/lib/api';
-import type { CocktailDBResponse, CocktailDBDrink } from '@/types/cocktail';
-import { hasDrinks } from '@/types/cocktail';
+import { describe, it, expect } from "vitest";
+import { searchDrinks, getDrinkById, getFirstDrink } from "@/lib/api";
+import type { CocktailDBResponse, CocktailDBDrink } from "@/types/cocktail";
+import { hasDrinks } from "@/types/cocktail";
 
 /**
  * API Integration Tests
@@ -13,13 +13,13 @@ import { hasDrinks } from '@/types/cocktail';
  * 4. Type guards work correctly
  */
 
-describe('API Integration Tests', () => {
-  describe('searchDrinks', () => {
-    it('should return drinks array for valid search query', async () => {
-      const result = await searchDrinks('margarita');
+describe("API Integration Tests", () => {
+  describe("searchDrinks", () => {
+    it("should return drinks array for valid search query", async () => {
+      const result = await searchDrinks("margarita");
 
       // Verify response structure
-      expect(result).toHaveProperty('drinks');
+      expect(result).toHaveProperty("drinks");
       expect(result.drinks).not.toBeNull();
 
       if (result.drinks) {
@@ -28,64 +28,65 @@ describe('API Integration Tests', () => {
 
         // Verify first drink structure matches CocktailDBDrink type
         const firstDrink = result.drinks[0];
-        expect(firstDrink).toHaveProperty('idDrink');
-        expect(firstDrink).toHaveProperty('strDrink');
-        expect(firstDrink).toHaveProperty('strDrinkThumb');
-        expect(typeof firstDrink.idDrink).toBe('string');
-        expect(typeof firstDrink.strDrink).toBe('string');
+        expect(firstDrink).toHaveProperty("idDrink");
+        expect(firstDrink).toHaveProperty("strDrink");
+        expect(firstDrink).toHaveProperty("strDrinkThumb");
+        expect(typeof firstDrink.idDrink).toBe("string");
+        expect(typeof firstDrink.strDrink).toBe("string");
       }
     });
 
-    it('should return null drinks for empty query', async () => {
-      const result = await searchDrinks('');
+    it("should return null drinks for empty query", async () => {
+      const result = await searchDrinks("");
       expect(result.drinks).toBeNull();
     });
 
-    it('should return null drinks for whitespace-only query', async () => {
-      const result = await searchDrinks('   ');
+    it("should return null drinks for whitespace-only query", async () => {
+      const result = await searchDrinks("   ");
       expect(result.drinks).toBeNull();
     });
 
-    it('should return null drinks for non-existent drink', async () => {
-      const result = await searchDrinks('nonexistentdrink12345');
+    it("should return null drinks for non-existent drink", async () => {
+      const result = await searchDrinks("nonexistentdrink12345");
       expect(result.drinks).toBeNull();
     });
 
-    it('should handle URL encoding correctly', async () => {
-      const result = await searchDrinks('margarita & lime');
+    it("should handle URL encoding correctly", async () => {
+      const result = await searchDrinks("margarita & lime");
       // Should not throw error, may return null or results
-      expect(result).toHaveProperty('drinks');
+      expect(result).toHaveProperty("drinks");
     });
 
-    it('should return drinks with all required fields', async () => {
-      const result = await searchDrinks('margarita');
+    it("should return drinks with all required fields", async () => {
+      const result = await searchDrinks("margarita");
 
       if (result.drinks && result.drinks.length > 0) {
         const drink = result.drinks[0];
 
         // Verify all required fields exist (even if null)
-        expect(drink).toHaveProperty('idDrink');
-        expect(drink).toHaveProperty('strDrink');
-        expect(drink).toHaveProperty('strDrinkAlternate');
-        expect(drink).toHaveProperty('strInstructions');
-        expect(drink).toHaveProperty('strDrinkThumb');
+        expect(drink).toHaveProperty("idDrink");
+        expect(drink).toHaveProperty("strDrink");
+        expect(drink).toHaveProperty("strDrinkAlternate");
+        expect(drink).toHaveProperty("strInstructions");
+        expect(drink).toHaveProperty("strDrinkThumb");
 
         // Verify ingredient fields exist (at least first few)
-        expect(drink).toHaveProperty('strIngredient1');
-        expect(drink).toHaveProperty('strMeasure1');
+        expect(drink).toHaveProperty("strIngredient1");
+        expect(drink).toHaveProperty("strMeasure1");
 
         // Verify field types
-        expect(typeof drink.idDrink).toBe('string');
-        expect(typeof drink.strDrink).toBe('string');
+        expect(typeof drink.idDrink).toBe("string");
+        expect(typeof drink.strDrink).toBe("string");
         // Optional fields can be string or null
         expect(
-          drink.strDrinkAlternate === null || typeof drink.strDrinkAlternate === 'string'
+          drink.strDrinkAlternate === null ||
+            typeof drink.strDrinkAlternate === "string"
         ).toBe(true);
       }
     });
 
-    it('should return drinks with ingredient and measure fields', async () => {
-      const result = await searchDrinks('margarita');
+    it("should return drinks with ingredient and measure fields", async () => {
+      const result = await searchDrinks("margarita");
 
       if (result.drinks && result.drinks.length > 0) {
         const drink = result.drinks[0];
@@ -101,12 +102,12 @@ describe('API Integration Tests', () => {
     });
   });
 
-  describe('getDrinkById', () => {
-    it('should return a single drink for valid ID', async () => {
+  describe("getDrinkById", () => {
+    it("should return a single drink for valid ID", async () => {
       // Using a known drink ID (Margarita)
-      const result = await getDrinkById('11007');
+      const result = await getDrinkById("11007");
 
-      expect(result).toHaveProperty('drinks');
+      expect(result).toHaveProperty("drinks");
       expect(result.drinks).not.toBeNull();
 
       if (result.drinks) {
@@ -114,63 +115,67 @@ describe('API Integration Tests', () => {
         expect(result.drinks.length).toBe(1);
 
         const drink = result.drinks[0];
-        expect(drink.idDrink).toBe('11007');
-        expect(drink.strDrink).toBe('Margarita');
+        expect(drink.idDrink).toBe("11007");
+        expect(drink.strDrink).toBe("Margarita");
       }
     });
 
-    it('should return null drinks for invalid ID', async () => {
-      const result = await getDrinkById('999999');
+    it("should return null drinks for invalid ID", async () => {
+      const result = await getDrinkById("999999");
       expect(result.drinks).toBeNull();
     });
 
-    it('should return null drinks for empty ID', async () => {
-      const result = await getDrinkById('');
+    it("should return null drinks for empty ID", async () => {
+      const result = await getDrinkById("");
       expect(result.drinks).toBeNull();
     });
 
-    it('should return null drinks for whitespace-only ID', async () => {
-      const result = await getDrinkById('   ');
+    it("should return null drinks for whitespace-only ID", async () => {
+      const result = await getDrinkById("   ");
       expect(result.drinks).toBeNull();
     });
 
-    it('should return drink with complete data structure', async () => {
-      const result = await getDrinkById('11007');
+    it("should return drink with complete data structure", async () => {
+      const result = await getDrinkById("11007");
 
       if (result.drinks && result.drinks.length > 0) {
         const drink = result.drinks[0];
 
         // Verify all fields from CocktailDBDrink interface exist
         const requiredFields: (keyof CocktailDBDrink)[] = [
-          'idDrink',
-          'strDrink',
-          'strDrinkAlternate',
-          'strTags',
-          'strVideo',
-          'strCategory',
-          'strIBA',
-          'strAlcoholic',
-          'strGlass',
-          'strInstructions',
-          'strDrinkThumb',
+          "idDrink",
+          "strDrink",
+          "strDrinkAlternate",
+          "strTags",
+          "strVideo",
+          "strCategory",
+          "strIBA",
+          "strAlcoholic",
+          "strGlass",
+          "strInstructions",
+          "strDrinkThumb",
         ];
 
-        requiredFields.forEach(field => {
+        requiredFields.forEach((field) => {
           expect(drink).toHaveProperty(field);
         });
 
         // Verify ingredient fields (1-15)
         for (let i = 1; i <= 15; i++) {
-          expect(drink).toHaveProperty(`strIngredient${i}` as keyof CocktailDBDrink);
-          expect(drink).toHaveProperty(`strMeasure${i}` as keyof CocktailDBDrink);
+          expect(drink).toHaveProperty(
+            `strIngredient${i}` as keyof CocktailDBDrink
+          );
+          expect(drink).toHaveProperty(
+            `strMeasure${i}` as keyof CocktailDBDrink
+          );
         }
       }
     });
   });
 
-  describe('getFirstDrink helper', () => {
-    it('should return first drink from response with drinks', async () => {
-      const result = await searchDrinks('margarita');
+  describe("getFirstDrink helper", () => {
+    it("should return first drink from response with drinks", async () => {
+      const result = await searchDrinks("margarita");
 
       if (result.drinks && result.drinks.length > 0) {
         const firstDrink = getFirstDrink(result);
@@ -179,26 +184,26 @@ describe('API Integration Tests', () => {
       }
     });
 
-    it('should return null for response with null drinks', () => {
+    it("should return null for response with null drinks", () => {
       const result: CocktailDBResponse = { drinks: null };
       const firstDrink = getFirstDrink(result);
       expect(firstDrink).toBeNull();
     });
 
-    it('should return null for response with empty array', () => {
+    it("should return null for response with empty array", () => {
       const result: CocktailDBResponse = { drinks: [] };
       const firstDrink = getFirstDrink(result);
       expect(firstDrink).toBeNull();
     });
   });
 
-  describe('hasDrinks type guard', () => {
-    it('should return true for response with drinks array', () => {
+  describe("hasDrinks type guard", () => {
+    it("should return true for response with drinks array", () => {
       const result: CocktailDBResponse = {
         drinks: [
           {
-            idDrink: '11007',
-            strDrink: 'Margarita',
+            idDrink: "11007",
+            strDrink: "Margarita",
             strDrinkAlternate: null,
             strTags: null,
             strVideo: null,
@@ -211,8 +216,8 @@ describe('API Integration Tests', () => {
             strInstructionsDE: null,
             strInstructionsFR: null,
             strInstructionsIT: null,
-            'strInstructionsZH-HANS': null,
-            'strInstructionsZH-HANT': null,
+            "strInstructionsZH-HANS": null,
+            "strInstructionsZH-HANT": null,
             strDrinkThumb: null,
             strIngredient1: null,
             strIngredient2: null,
@@ -260,21 +265,21 @@ describe('API Integration Tests', () => {
       }
     });
 
-    it('should return false for response with null drinks', () => {
+    it("should return false for response with null drinks", () => {
       const result: CocktailDBResponse = { drinks: null };
       expect(hasDrinks(result)).toBe(false);
     });
 
-    it('should return false for response with empty array', () => {
+    it("should return false for response with empty array", () => {
       const result: CocktailDBResponse = { drinks: [] };
       expect(hasDrinks(result)).toBe(false);
     });
   });
 
-  describe('Response Type Validation', () => {
-    it('should return responses that match CocktailDBResponse type', async () => {
-      const searchResult = await searchDrinks('margarita');
-      const drinkResult = await getDrinkById('11007');
+  describe("Response Type Validation", () => {
+    it("should return responses that match CocktailDBResponse type", async () => {
+      const searchResult = await searchDrinks("margarita");
+      const drinkResult = await getDrinkById("11007");
 
       // Type check - if this compiles, types are correct
       const searchResponse: CocktailDBResponse = searchResult;
@@ -284,8 +289,8 @@ describe('API Integration Tests', () => {
       expect(drinkResponse).toBeDefined();
     });
 
-    it('should handle drinks with various null fields correctly', async () => {
-      const result = await searchDrinks('margarita');
+    it("should handle drinks with various null fields correctly", async () => {
+      const result = await searchDrinks("margarita");
 
       if (result.drinks && result.drinks.length > 0) {
         const drink = result.drinks[0];
@@ -293,13 +298,13 @@ describe('API Integration Tests', () => {
         // Verify that null fields are handled correctly
         // Some fields may be null, which is valid per our type definition
         expect(
-          drink.strDrinkAlternate === null || typeof drink.strDrinkAlternate === 'string'
+          drink.strDrinkAlternate === null ||
+            typeof drink.strDrinkAlternate === "string"
         ).toBe(true);
         expect(
-          drink.strTags === null || typeof drink.strTags === 'string'
+          drink.strTags === null || typeof drink.strTags === "string"
         ).toBe(true);
       }
     });
   });
 });
-

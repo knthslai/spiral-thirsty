@@ -19,6 +19,7 @@ interface DrinkListItemProps {
  * - Row height: 60px
  * - Image: 40px circle, margins L: 10px, R: 15px, T: 10px, B: 10px
  * - Name: Font size 17px, vertically centered with image
+ * - Chevron icon on the right
  *
  * Features:
  * - Highlights matching text in drink name
@@ -47,6 +48,24 @@ function DrinkListItemComponent({
     [drink.name, searchTerm]
   );
 
+  // Chevron icon SVG
+  const ChevronIcon = () => (
+    <Box color="gray.400">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </Box>
+  );
+
   return (
     <Link href={`/drinks/${drink.id}`} style={{ textDecoration: "none" }}>
       <Flex
@@ -54,8 +73,9 @@ function DrinkListItemComponent({
         align="center"
         _hover={{ bg: customColors.cardHover }}
         cursor="pointer"
-        px={4}
+        px={0}
       >
+        {/* Image with specified margins */}
         <Box
           w="40px"
           h="40px"
@@ -91,7 +111,8 @@ function DrinkListItemComponent({
             </Box>
           )}
         </Box>
-        <Text fontSize="md" fontWeight="normal" flex={1}>
+        {/* Name with font size 17px */}
+        <Text fontSize="17px" fontWeight="normal" flex={1}>
           {highlightSegments.map((segment, index) =>
             segment.highlight ? (
               <span
@@ -109,6 +130,10 @@ function DrinkListItemComponent({
             )
           )}
         </Text>
+        {/* Chevron icon on the right */}
+        <Box mr={4} flexShrink={0}>
+          <ChevronIcon />
+        </Box>
       </Flex>
     </Link>
   );

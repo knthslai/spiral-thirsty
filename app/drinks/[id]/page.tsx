@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Heading, Text, Box } from "@chakra-ui/react";
 import Image from "next/image";
 import { customColors } from "@/theme";
@@ -9,6 +9,7 @@ import { IngredientsLabel } from "@/components/ingredients/IngredientsLabel";
 import { IngredientLegend } from "@/components/ingredients/IngredientLegend";
 import { IngredientsPieChart } from "@/components/ingredients/IngredientsPieChart";
 import { DrinkDetailSkeleton } from "@/components/drinks/skeletons/DrinkDetailSkeleton";
+import { addToViewedDrinks } from "@/lib/viewedDrinks";
 
 interface DrinkDetailPageProps {
   params: { id: string };
@@ -30,6 +31,17 @@ export default function DrinkDetailPage({ params }: DrinkDetailPageProps) {
   const id = params.id;
   const { data: drink, isLoading, error } = useDrinkDetails(id);
   const [imageError, setImageError] = useState(false);
+
+  // Track when drink is viewed
+  useEffect(() => {
+    if (drink) {
+      addToViewedDrinks({
+        id: drink.id,
+        name: drink.name,
+        image: drink.image,
+      });
+    }
+  }, [drink]);
 
   if (isLoading) {
     return <DrinkDetailSkeleton />;

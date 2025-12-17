@@ -2,12 +2,13 @@
 
 import { useState, useCallback, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Container } from "@chakra-ui/react";
+import { Container, Text, Box } from "@chakra-ui/react";
 import { SearchBar } from "@/components/common/SearchBar";
-import { SearchHistory } from "@/components/common/SearchHistory";
+import { ViewedDrinks } from "@/components/common/SearchHistory";
 import { DrinkList } from "@/components/drinks/DrinkList";
 import { DrinkListSkeleton } from "@/components/drinks/skeletons/DrinkListSkeleton";
 import { useDrinkSearch } from "@/hooks/useDrinkSearch";
+import { customColors } from "@/theme";
 
 /**
  * Search page content component that uses useSearchParams
@@ -54,7 +55,12 @@ function SearchPageContent() {
         onSearchChange={handleSearchChange}
         initialValue={initialSearchValue}
       />
-      <SearchHistory onSelectSearch={handleSearchChange} />
+      <Box
+        borderTop="1px solid"
+        borderColor={customColors.borderLight}
+        mb={4}
+      />
+      <ViewedDrinks />
       {isLoading ? (
         <DrinkListSkeleton count={8} />
       ) : (
@@ -80,6 +86,8 @@ function SearchPageContent() {
  * - Query parameter support (?search=margarita)
  * - Search history from localStorage
  * - Clicking history items triggers search
+ * - Title header "Thirsty" at the top
+ * - Max width container for content
  *
  * Optimizations:
  * - Memoized search handler to prevent unnecessary re-renders
@@ -88,10 +96,22 @@ function SearchPageContent() {
  */
 export default function Home() {
   return (
-    <Container maxW="container.md" py={8}>
-      <Suspense fallback={<DrinkListSkeleton count={8} />}>
-        <SearchPageContent />
-      </Suspense>
-    </Container>
+    <Box w="100%" minH="100vh" bg="white">
+      <Container maxW="500px" py={8} px={4}>
+        {/* Title header */}
+        <Text
+          fontSize="2xl"
+          fontWeight="bold"
+          textAlign="center"
+          mb={6}
+          color="gray.800"
+        >
+          Thirsty
+        </Text>
+        <Suspense fallback={<DrinkListSkeleton count={8} />}>
+          <SearchPageContent />
+        </Suspense>
+      </Container>
+    </Box>
   );
 }

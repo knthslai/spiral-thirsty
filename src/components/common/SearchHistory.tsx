@@ -2,38 +2,65 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Box, Text, Flex } from "@chakra-ui/react";
-import { getSearchHistory, clearSearchHistory } from "@/lib/searchHistory";
+import Link from "next/link";
+import Image from "next/image";
+import { getViewedDrinks, clearViewedDrinks } from "@/lib/viewedDrinks";
 import { customColors } from "@/theme";
+import type { DrinkListItem } from "@/types/cocktail";
 
-interface SearchHistoryProps {
-  onSelectSearch: (searchTerm: string) => void;
+interface ViewedDrinksProps {
+  onSelectDrink?: (drinkId: string) => void;
 }
 
 /**
- * Component displaying previous search terms from localStorage
- * Clicking a term triggers a new search
+ * Component displaying last 5 viewed drinks from localStorage
+ * Clicking a drink navigates to its detail page
+ * Previously named SearchHistory, now tracks viewed drinks instead
  */
-export function SearchHistory({ onSelectSearch }: SearchHistoryProps) {
-  const [history, setHistory] = useState<string[]>([]);
+export function ViewedDrinks({ onSelectDrink }: ViewedDrinksProps) {
+  const [viewedDrinks, setViewedDrinks] = useState<DrinkListItem[]>([]);
 
-  // Load history from localStorage on mount
+  // Load viewed drinks from localStorage on mount and when page becomes visible
   useEffect(() => {
-    setHistory(getSearchHistory());
-  }, []);
+    const loadViewedDrinks = () => {
+      setViewedDrinks(getViewedDrinks());
+    };
 
-  const handleSelect = useCallback(
-    (term: string) => {
-      onSelectSearch(term);
-    },
-    [onSelectSearch]
-  );
+    loadViewedDrinks();
+
+    // Refresh when navigating back (listen for storage events)
+    const handleStorageChange = () => {
+      loadViewedDrinks();
+    };
+
+    // Listen for custom events from same-window updates
+    window.addEventListener("viewedDrinksUpdated", handleStorageChange);
+    // Listen for visibility change (when user navigates back to the page)
+    document.addEventListener("visibilitychange", loadViewedDrinks);
+
+    return () => {
+      window.removeEventListener("viewedDrinksUpdated", handleStorageChange);
+      document.removeEventListener("visibilitychange", loadViewedDrinks);
+    };
+  }, []);
 
   const handleClear = useCallback(() => {
-    clearSearchHistory();
-    setHistory([]);
+    clearViewedDrinks();
+    setViewedDrinks([]);
+    // Dispatch custom event for same-window updates
+    window.dispatchEvent(new Event("viewedDrinksUpdated"));
   }, []);
 
-  if (history.length === 0) {
+  const handleDrinkClick = useCallback(
+    (drinkId: string) => {
+      if (onSelectDrink) {
+        onSelectDrink(drinkId);
+      }
+    },
+    [onSelectDrink]
+  );
+
+  if (viewedDrinks.length === 0) {
     return null;
   }
 
@@ -45,7 +72,7 @@ export function SearchHistory({ onSelectSearch }: SearchHistoryProps) {
           color={customColors.textSecondary}
           fontWeight="medium"
         >
-          Recent searches:
+          Recently viewed:
         </Text>
         <Box
           as="button"
@@ -61,23 +88,46 @@ export function SearchHistory({ onSelectSearch }: SearchHistoryProps) {
         </Box>
       </Flex>
       <Flex gap={2} flexWrap="wrap">
-        {history.map((term) => (
-          <Box
-            key={term}
-            as="button"
-            px={3}
-            py={1}
-            borderRadius="md"
-            bg="gray.100"
-            _hover={{ bg: "gray.200" }}
-            cursor="pointer"
-            onClick={() => handleSelect(term)}
-            fontSize="sm"
-            color={customColors.textPrimary}
-            transition="background-color 0.2s"
+        {viewedDrinks.map((drink) => (
+          <Link
+            key={drink.id}
+            href={`/drinks/${drink.id}`}
+            onClick={() => handleDrinkClick(drink.id)}
+            style={{ textDecoration: "none" }}
           >
-            {term}
-          </Box>
+            <Flex
+              align="center"
+              gap={2}
+              px={3}
+              py={1}
+              borderRadius="md"
+              bg="gray.100"
+              _hover={{ bg: "gray.200" }}
+              cursor="pointer"
+              transition="background-color 0.2s"
+            >
+              {drink.image && (
+                <Box
+                  w="24px"
+                  h="24px"
+                  borderRadius="full"
+                  overflow="hidden"
+                  flexShrink={0}
+                  position="relative"
+                >
+                  <Image
+                    src={drink.image}
+                    alt={drink.name}
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </Box>
+              )}
+              <Text fontSize="sm" color={customColors.textPrimary}>
+                {drink.name}
+              </Text>
+            </Flex>
+          </Link>
         ))}
       </Flex>
     </Box>

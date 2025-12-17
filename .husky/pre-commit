@@ -1,8 +1,21 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Ensure bun is in PATH
+export PATH="$HOME/.bun/bin:$PATH"
+
 echo "Running linting..."
 bun run lint
 
-echo "Running e2e tests..."
-bun run test:e2e
+# Check if any code-related files have changed
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM)
+
+# Patterns that indicate code changes that should trigger e2e tests
+CODE_PATTERNS="^app/|^src/|^components/|^lib/|^hooks/|^types/|^theme/|\.tsx?$|\.jsx?$|^next\.config|^playwright\.config|^package\.json"
+
+if echo "$STAGED_FILES" | grep -qE "$CODE_PATTERNS"; then
+  echo "Code-related files changed. Running e2e tests..."
+  bun run test:e2e
+else
+  echo "No code-related files changed. Skipping e2e tests."
+fi

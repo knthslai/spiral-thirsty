@@ -1,0 +1,218 @@
+# Cursor Project Rules — Spiral Thirsty Take-Home Challenge
+
+# Purpose: Guide Cursor to generate code that aligns with Spiral's expectations,
+
+# the provided PDF spec, and senior-level frontend assessment criteria.
+
+---
+
+## 1. Core Principles (Highest Priority)
+
+- Follow the **PDF requirements exactly** before adding enhancements.
+- Prefer **clarity and correctness** over clever abstractions.
+- Optimize for **readability, maintainability, and reviewability**.
+- Avoid speculative features or premature optimization.
+- Treat this as **production-quality frontend code**, not a demo.
+
+---
+
+## 2. Required Technology Constraints (DO NOT VIOLATE)
+
+Cursor MUST:
+
+- Use **Next.js with the App Router**
+- Use **TypeScript** with strict typing
+- Use **React 18** function components
+- Use **Chakra UI** for all layout and styling
+- Use **@tanstack/react-query** for API data fetching
+- Use the **CocktailDB REST API** only
+
+Cursor MUST NOT:
+
+- Introduce Redux, Zustand, or other global state libraries
+- Use inline styles or CSS files instead of Chakra props
+- Use class-based React components
+- Use axios unless explicitly requested
+- Bypass TypeScript with `any`
+
+---
+
+## 3. Project Structure Rules
+
+Cursor must follow this structure unless explicitly instructed otherwise:
+
+src/
+app/
+layout.tsx
+page.tsx # Search screen
+drinks/[id]/page.tsx # Details screen
+
+components/
+SearchBar.tsx
+DrinkList.tsx
+DrinkListItem.tsx
+IngredientLegend.tsx
+IngredientsPieChart.tsx
+LoadingState.tsx
+
+hooks/
+useDrinkSearch.ts
+useDrinkDetails.ts
+
+lib/
+api.ts # API calls only
+ingredientUtils.ts # unit conversion + filtering
+colorUtils.ts # pastel color generation
+
+types/
+cocktail.ts
+
+theme/
+index.ts
+
+**tests**/
+ingredientUtils.test.ts
+
+---
+
+## 4. Data Fetching Rules
+
+- All API calls MUST be defined in `lib/api.ts`
+- React Query hooks MUST live in `hooks/`
+- Query keys must be stable and descriptive
+  - Example: `["drinks", searchTerm]`
+- Do NOT fetch directly inside components
+
+---
+
+## 5. Ingredient & Measurement Handling Rules
+
+Cursor MUST:
+
+- Normalize ingredient data from `strIngredientX` / `strMeasureX`
+- Convert all supported units into **milliliters (ml)**
+- Exclude unsupported or malformed units from the pie chart
+- Handle partial or missing ingredient data gracefully
+
+Cursor MUST NOT:
+
+- Assume API data is clean or consistent
+- Crash when measurements are missing
+
+---
+
+## 6. UI & Layout Rules (Chakra UI)
+
+- All layout must use Chakra primitives (`Flex`, `Box`, `Stack`, etc.)
+- Respect spacing, sizing, and hierarchy from the PDF spec
+- Fixed list row height: **60px**
+- Images must be circular using Chakra props
+- Typography must use Chakra `Text` with explicit font sizes
+
+Do NOT over-design. Keep UI clean and minimal.
+
+---
+
+## 7. Pie Chart & Legend Rules
+
+- Pie chart must only include convertible ingredients
+- Ingredient colors must be:
+  - Random but deterministic per ingredient
+  - Pastel-toned if possible
+- Legend colors must match pie chart colors exactly
+- Chart size must be ~120px
+
+---
+
+## 8. State Management Rules
+
+- React Query handles server state ONLY
+- Local `useState` allowed for:
+  - Search input
+  - UI-only concerns
+- No global app state
+
+---
+
+## 9. Error Handling Philosophy
+
+- Network error handling is NOT required
+- UI must gracefully handle:
+  - Empty search results
+  - Missing images
+  - Partial ingredient data
+
+Do NOT overbuild error states.
+
+---
+
+## 10. Testing Rules (Extra Credit)
+
+Cursor SHOULD:
+
+- Write at least one unit test for a pure function
+- Prefer testing `ingredientUtils` over UI components
+- Avoid snapshot testing
+
+Cursor MUST NOT:
+
+- Add excessive test coverage
+
+---
+
+## 11. Storybook Rules (Optional Extra Credit)
+
+If Storybook is added:
+
+- Include at least one component story
+- Prefer `DrinkListItem` or `IngredientLegend`
+- Keep stories simple and focused
+
+---
+
+## 12. README Expectations
+
+Cursor MUST generate a README that includes:
+
+- Project overview
+- Setup instructions
+- API reference
+- Architectural decisions
+- Trade-offs and assumptions
+- Deployment URL (if available)
+
+---
+
+## 13. Code Review Readiness Rules
+
+Before generating or modifying code, Cursor must:
+
+- Check for existing implementations first
+- Extend existing utilities instead of duplicating logic
+- Avoid unused code or speculative helpers
+- Ensure the project builds without errors
+
+---
+
+## 14. AI Usage Transparency
+
+Cursor should favor:
+
+- Small, incremental changes
+- Clear commit-style reasoning
+- Explain non-obvious decisions in comments ONLY when valuable
+
+---
+
+## 15. Final Priority Order
+
+1. Correctness vs PDF spec
+2. Clean architecture
+3. Type safety
+4. Readability
+5. Visual fidelity
+6. Extras (tests, Storybook, deploy)
+
+---
+
+# End of Cursor Rules

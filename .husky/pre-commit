@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Running linting..."
+bun run lint
+
+echo "Running e2e tests..."
+bun run test:e2e

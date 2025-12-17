@@ -3,6 +3,22 @@ import { test, expect } from "@playwright/test";
 // Increase test timeout for API calls
 test.setTimeout(60000);
 
+// Helper function to wait for search results
+async function waitForSearchResults(page: any, timeout = 40000) {
+  await page.waitForSelector('a[href^="/drinks/"]', { timeout });
+}
+
+// Helper function to perform search
+async function performSearch(page: any, searchTerm: string) {
+  const searchBar = page.getByPlaceholder("Find a drink");
+  await expect(searchBar).toBeVisible();
+  await searchBar.clear();
+  await page.waitForTimeout(100);
+  await searchBar.fill(searchTerm);
+  await page.waitForTimeout(2000); // Wait for debounce + API call
+  await waitForSearchResults(page);
+}
+
 test.describe("Search Behavior and Navigation", () => {
   test("should display search results and prioritize prefix matches", async ({
     page,
@@ -20,16 +36,8 @@ test.describe("Search Behavior and Navigation", () => {
         // If no results, that's okay, we'll search
       });
 
-    // Clear and type "marg" in search bar
-    await searchBar.clear();
-    await page.waitForTimeout(100);
-    await searchBar.fill("marg");
-
-    // Wait for debounce (500ms) plus API call
-    await page.waitForTimeout(2000);
-
-    // Wait for results to load - use more flexible selector
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Perform search
+    await performSearch(page, "marg");
 
     // Get all drink links
     const drinkLinks = page.locator('a[href^="/drinks/"]');
@@ -46,17 +54,8 @@ test.describe("Search Behavior and Navigation", () => {
   test("should highlight matching text in search results", async ({ page }) => {
     await page.goto("/");
 
-    const searchBar = page.getByPlaceholder("Find a drink");
-    await expect(searchBar).toBeVisible();
-
-    // Clear and type
-    await searchBar.clear();
-    await page.waitForTimeout(100);
-    await searchBar.fill("marg");
-    await page.waitForTimeout(2000);
-
-    // Wait for results
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Perform search
+    await performSearch(page, "marg");
 
     // Get first drink link
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
@@ -80,14 +79,12 @@ test.describe("Search Behavior and Navigation", () => {
 
     // Results might already be loaded from default search
     // Wait for results (either from default or after typing)
-    await page
-      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
-      .catch(async () => {
-        // If no results, trigger search
-        await searchBar.fill("margarita");
-        await page.waitForTimeout(2000);
-        await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
-      });
+    try {
+      await waitForSearchResults(page, 10000);
+    } catch {
+      // If no results, trigger search
+      await performSearch(page, "margarita");
+    }
 
     // Get first drink link
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
@@ -187,17 +184,8 @@ test.describe("Search Behavior and Navigation", () => {
   test("should sort prefix matches alphabetically", async ({ page }) => {
     await page.goto("/");
 
-    const searchBar = page.getByPlaceholder("Find a drink");
-    await expect(searchBar).toBeVisible();
-
-    // Clear and type
-    await searchBar.clear();
-    await page.waitForTimeout(100);
-    await searchBar.fill("marg");
-    await page.waitForTimeout(2000);
-
-    // Wait for results
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Perform search
+    await performSearch(page, "marg");
 
     // Get drink names
     const drinkLinks = page.locator('a[href^="/drinks/"]');

@@ -17,7 +17,7 @@ export function DetailPageHeader({ drinkName }: DetailPageHeaderProps) {
   const router = useRouter();
 
   return (
-    <Flex direction="column" gap={2} mb={4}>
+    <Flex direction="column" gap={2}>
       {/* Back button with "Thirsty" */}
       <Flex align="center">
         <IconButton

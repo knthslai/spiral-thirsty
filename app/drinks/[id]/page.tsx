@@ -46,13 +46,46 @@ export default function DrinkDetailPage({ params }: DrinkDetailPageProps) {
   }, [drink]);
 
   if (isLoading) {
-    return <DrinkDetailSkeleton />;
+    return (
+      <Box
+        w="100%"
+        h="100vh"
+        bg="white"
+        display="flex"
+        flexDirection="column"
+        overflow="hidden"
+      >
+        <Box
+          position="sticky"
+          top={0}
+          zIndex={10}
+          bg="white"
+          borderBottom="1px solid"
+          borderColor={customColors.borderLight}
+          py={4}
+        >
+          <Container maxW="500px" px={4}>
+            <Box h="60px" />
+          </Container>
+        </Box>
+        <Box flex={1} overflowY="auto">
+          <DrinkDetailSkeleton />
+        </Box>
+      </Box>
+    );
   }
 
   if (error || !drink) {
     return (
-      <Box w="100%" minH="100vh" bg="white">
-        <Container maxW="500px" py={8} px={4}>
+      <Box
+        w="100%"
+        h="100vh"
+        bg="white"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Container maxW="500px" px={4}>
           <Text textAlign="center" color={customColors.textSecondary}>
             Drink not found.
           </Text>
@@ -62,38 +95,60 @@ export default function DrinkDetailPage({ params }: DrinkDetailPageProps) {
   }
 
   return (
-    <Box w="100%" minH="100vh" bg="white">
-      <Container maxW="500px" py={8} px={4}>
-        <DetailPageHeader drinkName={drink.name} />
+    <Box
+      w="100%"
+      h="100vh"
+      bg="white"
+      display="flex"
+      flexDirection="column"
+      overflow="hidden"
+    >
+      {/* Fixed header */}
+      <Box
+        position="sticky"
+        top={0}
+        zIndex={10}
+        bg="white"
+        borderBottom="1px solid"
+        borderColor={customColors.borderLight}
+        py={4}
+      >
+        <Container maxW="500px" px={4}>
+          <DetailPageHeader drinkName={drink.name} />
+        </Container>
+      </Box>
+      {/* Scrollable content */}
+      <Box flex={1} overflowY="auto">
+        <Container maxW="500px" py={4} px={4}>
+          <DrinkImage imageUrl={drink.image} drinkName={drink.name} />
 
-        <DrinkImage imageUrl={drink.image} drinkName={drink.name} />
+          {/* Name - font size: 20px, bold, top margin: 20px, centered */}
+          <Heading
+            as="h1"
+            fontSize="20px"
+            fontWeight="bold"
+            textAlign="center"
+            mt="20px"
+            mx="auto"
+            maxW="100%"
+            style={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+            }}
+          >
+            {drink.name}
+          </Heading>
 
-        {/* Name - font size: 20px, bold, top margin: 20px, centered */}
-        <Heading
-          as="h1"
-          fontSize="20px"
-          fontWeight="bold"
-          textAlign="center"
-          mt="20px"
-          mx="auto"
-          maxW="100%"
-          style={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-          }}
-        >
-          {drink.name}
-        </Heading>
+          <IngredientsLabel />
 
-        <IngredientsLabel />
+          <IngredientsSection ingredients={drink.ingredients} />
 
-        <IngredientsSection ingredients={drink.ingredients} />
-
-        <InstructionsSection instructions={drink.instructions} />
-      </Container>
+          <InstructionsSection instructions={drink.instructions} />
+        </Container>
+      </Box>
     </Box>
   );
 }

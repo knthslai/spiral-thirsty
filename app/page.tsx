@@ -96,22 +96,43 @@ function SearchPageContent() {
  */
 export default function Home() {
   return (
-    <Box w="100%" minH="100vh" bg="white">
-      <Container maxW="500px" py={8} px={4}>
-        {/* Title header */}
-        <Text
-          fontSize="2xl"
-          fontWeight="bold"
-          textAlign="center"
-          mb={6}
-          color="gray.800"
-        >
-          Thirsty
-        </Text>
-        <Suspense fallback={<DrinkListSkeleton count={8} />}>
-          <SearchPageContent />
-        </Suspense>
-      </Container>
+    <Box
+      w="100%"
+      h="100vh"
+      bg="white"
+      display="flex"
+      flexDirection="column"
+      overflow="hidden"
+    >
+      {/* Fixed header */}
+      <Box
+        position="sticky"
+        top={0}
+        zIndex={10}
+        bg="white"
+        borderBottom="1px solid"
+        borderColor={customColors.borderLight}
+        py={4}
+      >
+        <Container maxW="500px" px={4}>
+          <Text
+            fontSize="2xl"
+            fontWeight="bold"
+            textAlign="center"
+            color="gray.800"
+          >
+            Thirsty
+          </Text>
+        </Container>
+      </Box>
+      {/* Scrollable content */}
+      <Box flex={1} overflowY="auto">
+        <Container maxW="500px" py={4} px={4}>
+          <Suspense fallback={<DrinkListSkeleton count={8} />}>
+            <SearchPageContent />
+          </Suspense>
+        </Container>
+      </Box>
     </Box>
   );
 }

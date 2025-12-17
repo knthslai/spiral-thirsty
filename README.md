@@ -1,6 +1,14 @@
-# Spiral Thirsty - Drink Finder App
+# Spiral - Thirsty - Drink Finder App
+
+<div align="center">
+  <img src="./docs/Thirsty-demo.gif" alt="Thirsty Demo" />
+</div>
 
 A Next.js application for finding and displaying cocktail recipes, built as part of Spiral's take-home coding challenge.
+
+## Live Demo
+
+🚀 **Try it out**: [https://spiral-thirsty.vercel.app/](https://spiral-thirsty.vercel.app/)
 
 ## Tech Stack
 

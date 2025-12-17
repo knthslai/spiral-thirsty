@@ -35,11 +35,13 @@ export function SearchBar({
   const hasInitialized = useRef(false);
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isClearingRef = useRef(false);
+  const prevInitialValueRef = useRef(initialValue);
 
   // Initialize with initialValue if provided
   useEffect(() => {
     if (initialValue && !hasInitialized.current) {
       hasInitialized.current = true;
+      prevInitialValueRef.current = initialValue;
       setSearchTerm(initialValue);
       // Trigger search immediately if we have an initial value
       if (initialValue.trim()) {
@@ -49,10 +51,19 @@ export function SearchBar({
   }, [initialValue]);
 
   // Sync with initialValue changes (e.g., from URL changes)
-  // Only sync if initialValue actually changed externally
+  // Only sync if initialValue changed externally AND searchTerm doesn't match
+  // This prevents resetting the input when our own search updates the URL
   useEffect(() => {
-    if (hasInitialized.current && initialValue !== searchTerm) {
-      setSearchTerm(initialValue);
+    if (
+      hasInitialized.current &&
+      initialValue !== prevInitialValueRef.current
+    ) {
+      prevInitialValueRef.current = initialValue;
+      // Only sync if searchTerm doesn't match the new initialValue
+      // This means the change came from external navigation, not our own search
+      if (searchTerm !== initialValue) {
+        setSearchTerm(initialValue);
+      }
     }
   }, [initialValue, searchTerm]);
 
@@ -81,16 +92,14 @@ export function SearchBar({
       debounceTimerRef.current = null;
     }
 
-    // Don't trigger search for empty string - let parent handle default
-    if (searchTerm.trim() === "") {
-      callbackRef.current("");
-      return;
-    }
-
+    // Debounce all search triggers, including empty strings
+    // This prevents searches from firing on every keystroke including backspace/delete
     debounceTimerRef.current = setTimeout(() => {
       callbackRef.current(searchTerm);
-      // Save to search history when search is triggered
-      addToSearchHistory(searchTerm);
+      // Save to search history when search is triggered (only for non-empty terms)
+      if (searchTerm.trim()) {
+        addToSearchHistory(searchTerm);
+      }
       debounceTimerRef.current = null;
     }, 500); // 500ms debounce - increased to reduce API calls
 

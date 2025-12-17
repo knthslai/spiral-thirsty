@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Input, Flex, Box, IconButton } from "@chakra-ui/react";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { addToSearchHistory } from "@/lib/searchHistory";
 
 interface SearchBarProps {
@@ -145,19 +146,7 @@ export function SearchBar({
         pointerEvents="none"
         color="gray.400"
       >
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.35-4.35" />
-        </svg>
+        <MagnifyingGlassIcon width={16} height={16} />
       </Box>
       <Input
         placeholder={placeholder}
@@ -194,19 +183,7 @@ export function SearchBar({
             h="20px"
             p={0}
           >
-            <svg
-              width="12"
-              height="12"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
+            <XMarkIcon width={12} height={12} />
           </IconButton>
         </Box>
       )}

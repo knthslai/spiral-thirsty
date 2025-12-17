@@ -89,7 +89,7 @@ function IngredientsPieChartComponent({
   }
 
   return (
-    <Box ml="20px" mr="20px" mt="20px" mb="20px" w="120px" h="120px" mx="auto">
+    <Box w="120px" h="120px" flexShrink={0}>
       <svg width="120" height="120" viewBox="0 0 120 120">
         {paths}
       </svg>

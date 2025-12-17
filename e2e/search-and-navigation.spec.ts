@@ -117,17 +117,21 @@ test.describe("Search Behavior and Navigation", () => {
     // At least one should be present if ingredients exist
     expect(hasPieChart || hasLegend).toBeTruthy();
 
-    // Verify instructions are displayed
-    // Instructions should contain common cocktail preparation words
+    // Verify instructions are displayed as an ordered list
+    const orderedList = page.locator("ol");
+    const listItemCount = await orderedList.locator("li").count();
+
+    // Instructions should be present for a valid drink
+    expect(listItemCount).toBeGreaterThan(0);
+
+    // Verify instructions contain common cocktail preparation words
     const instructionsContainer = page.locator(
       "text=/mix|shake|stir|pour|add|blend|combine/i"
     );
     const instructionsCount = await instructionsContainer.count();
 
-    // Instructions should be present for a valid drink
+    // Instructions text should be visible
     expect(instructionsCount).toBeGreaterThan(0);
-
-    // Verify the instructions text is visible
     if (instructionsCount > 0) {
       await expect(instructionsContainer.first()).toBeVisible();
     }

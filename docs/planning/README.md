@@ -65,6 +65,30 @@ This directory contains detailed documentation of the planning steps, decisions,
    - Intelligent test execution based on file changes
    - Reasoning for testing and formatting decisions
 
+9. **[07-page-components-styling.md](./07-page-components-styling.md)**
+   - Page layout and component structure planning
+   - Chakra UI theme configuration
+   - Component hierarchy and spacing specifications
+
+10. **[08-feature-implementation.md](./08-feature-implementation.md)**
+    - Search history with localStorage
+    - Query parameter support
+    - Text highlighting in search results
+    - Result sorting improvements
+
+11. **[09-search-ui-and-viewed-drinks.md](./09-search-ui-and-viewed-drinks.md)**
+    - Search bar UI styling improvements
+    - Clear button functionality
+    - Divider element
+    - Viewed drinks tracking system
+
+12. **[10-ui-improvements-and-icons.md](./10-ui-improvements-and-icons.md)**
+    - Heroicons icon library integration
+    - Component refactoring (detail page)
+    - Instructions display improvements (ordered list)
+    - E2E test updates
+    - Code maintainability improvements
+
 ## Purpose
 
 These documents serve to:

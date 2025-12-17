@@ -46,7 +46,7 @@ function IngredientLegendComponent({ ingredients }: IngredientLegendProps) {
               bg={color}
               flexShrink={0}
             />
-            <Text fontSize="md">{displayText}</Text>
+            <Text fontSize="17px">{displayText}</Text>
           </Flex>
         );
       }),
@@ -58,7 +58,7 @@ function IngredientLegendComponent({ ingredients }: IngredientLegendProps) {
   }
 
   return (
-    <Flex wrap="wrap" gap={3} ml="20px" mr="20px" mt="20px" mb="20px">
+    <Flex wrap="wrap" gap={3}>
       {legendItems}
     </Flex>
   );

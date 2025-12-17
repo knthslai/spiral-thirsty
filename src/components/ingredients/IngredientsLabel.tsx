@@ -11,7 +11,7 @@ import { Text } from "@chakra-ui/react";
  */
 export function IngredientsLabel() {
   return (
-    <Text fontSize="md" fontWeight="bold" ml="20px" mt="30px" mb="20px">
+    <Text fontSize="17px" fontWeight="bold" ml="20px" mt="30px" mb="20px">
       Ingredients:
     </Text>
   );

@@ -4,6 +4,7 @@ import { memo, useCallback, useMemo } from "react";
 import { Flex, Text, Box } from "@chakra-ui/react";
 import Link from "next/link";
 import Image from "next/image";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { customColors } from "@/theme";
 import { highlightText } from "@/lib/textHighlight";
 import type { DrinkListItem as DrinkListItemType } from "@/types/cocktail";
@@ -46,24 +47,6 @@ function DrinkListItemComponent({
   const highlightSegments = useMemo(
     () => highlightText(drink.name, searchTerm),
     [drink.name, searchTerm]
-  );
-
-  // Chevron icon SVG
-  const ChevronIcon = () => (
-    <Box color="gray.400">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="9 18 15 12 9 6" />
-      </svg>
-    </Box>
   );
 
   return (
@@ -131,8 +114,8 @@ function DrinkListItemComponent({
           )}
         </Text>
         {/* Chevron icon on the right */}
-        <Box mr={4} flexShrink={0}>
-          <ChevronIcon />
+        <Box mr={4} flexShrink={0} color="gray.400">
+          <ChevronRightIcon width={16} height={16} />
         </Box>
       </Flex>
     </Link>

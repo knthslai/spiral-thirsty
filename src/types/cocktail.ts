@@ -26,8 +26,8 @@ export interface CocktailDBDrink {
   strInstructionsDE: string | null;
   strInstructionsFR: string | null;
   strInstructionsIT: string | null;
-  'strInstructionsZH-HANS': string | null;
-  'strInstructionsZH-HANT': string | null;
+  "strInstructionsZH-HANS": string | null;
+  "strInstructionsZH-HANT": string | null;
   strDrinkThumb: string | null;
   strIngredient1: string | null;
   strIngredient2: string | null;
@@ -85,7 +85,7 @@ export interface CocktailDBResponse {
 export interface Ingredient {
   name: string;
   amount: number; // Amount in milliliters
-  unit: 'ml';
+  unit: "ml";
   originalMeasure: string | null; // Original measurement string from API for display
 }
 
@@ -118,6 +118,9 @@ export interface Drink {
 export function hasDrinks(
   response: CocktailDBResponse
 ): response is { drinks: CocktailDBDrink[] } {
-  return response.drinks !== null && Array.isArray(response.drinks);
+  return (
+    response.drinks !== null &&
+    Array.isArray(response.drinks) &&
+    response.drinks.length > 0
+  );
 }
-

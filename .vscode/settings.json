@@ -1,0 +1,12 @@
+{
+  "workbench.editorAssociations": {
+    "*.md": "default"
+  },
+  "files.associations": {
+    "*.md": "markdown"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": null,
+    "editor.wordWrap": "on"
+  }
+}

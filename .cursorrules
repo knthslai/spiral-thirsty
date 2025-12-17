@@ -151,17 +151,41 @@ Do NOT overbuild error states.
 
 ---
 
-## 10. Testing Rules (Extra Credit)
+## 10. Testing Rules
+
+Cursor MUST:
+
+- **Write appropriate tests when completing a task** - Every completed feature, utility function, or API integration MUST have corresponding tests
+- **Place tests in the correct location**:
+  - Unit tests for utilities → `src/tests/[utilityName].test.ts` (e.g., `src/tests/ingredientUtils.test.ts`)
+  - API integration tests → `src/tests/api.test.ts`
+  - Component tests → `src/tests/[componentName].test.tsx` (if using React Testing Library)
+  - E2E tests → `e2e/[feature].spec.ts` (using Playwright)
+- **Test the right things**:
+  - Pure functions and utilities MUST have unit tests
+  - API functions MUST have integration tests verifying response structure
+  - Complex business logic MUST have tests
+  - Edge cases and error handling MUST be tested
+- **Prefer testing pure functions and utilities** over UI components
+- **Use Vitest for unit/integration tests** - Tests should be in `src/tests/` directory
+- **Use Playwright for E2E tests** - Tests should be in `e2e/` directory
 
 Cursor SHOULD:
 
-- Write at least one unit test for a pure function
-- Prefer testing `ingredientUtils` over UI components
-- Avoid snapshot testing
+- Write tests that verify:
+  - Function returns expected output for given inputs
+  - Edge cases are handled correctly
+  - Type safety is maintained
+  - API responses match TypeScript types
+- Keep tests focused and readable
+- Use descriptive test names that explain what is being tested
 
 Cursor MUST NOT:
 
-- Add excessive test coverage
+- Skip writing tests for completed functionality
+- Add excessive or redundant test coverage
+- Use snapshot testing (prefer explicit assertions)
+- Write tests that are overly complex or hard to understand
 
 ---
 
@@ -199,6 +223,13 @@ Before generating or modifying code, Cursor must:
 - Write code that is **defensible during a lead engineer review**
 - Make decisions that can be **explained and justified** if questioned
 - Structure code to be **copyable, extensible, and maintainable**
+
+**When completing a task, Cursor MUST:**
+
+- **Write appropriate tests** - See section 10 for testing requirements
+- **Place tests in the correct file** - Follow the test file naming and location conventions
+- **Verify tests pass** - Run `npm run test:run` to ensure all tests pass before marking task complete
+- **Update existing tests if needed** - If functionality changes, update related tests accordingly
 
 ---
 

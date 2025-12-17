@@ -3,8 +3,7 @@ import { test, expect } from "@playwright/test";
 // Increase test timeout for API calls
 test.setTimeout(60000);
 
-// Skip tests that require external API calls to avoid rate limiting
-test.describe.skip("Search Behavior and Navigation", () => {
+test.describe("Search Behavior and Navigation", () => {
   test("should display search results and prioritize prefix matches", async ({
     page,
   }) => {
@@ -48,7 +47,7 @@ test.describe.skip("Search Behavior and Navigation", () => {
     // Get first drink link
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
 
-    // Check for highlighted text (yellow background)
+    // Check for highlighted text (yellow background - #fef08a or backgroundColor in style)
     const highlightedText = firstDrink.locator('span[style*="background"]');
     const highlightedCount = await highlightedText.count();
 
@@ -89,33 +88,49 @@ test.describe.skip("Search Behavior and Navigation", () => {
     // Navigate directly to a known drink (Margarita - ID 11007)
     await page.goto("/drinks/11007");
 
-    // Wait for page to load
+    // Wait for page to load - check for drink name heading
     await page.waitForSelector("h1", { timeout: 20000 });
 
-    // Verify drink name is displayed
+    // Verify drink name is displayed and visible
     const drinkName = page.locator("h1").first();
     await expect(drinkName).toBeVisible();
     const nameText = await drinkName.textContent();
     expect(nameText).toBeTruthy();
-    expect(nameText?.length).toBeGreaterThan(0);
+    expect(nameText?.trim().length).toBeGreaterThan(0);
+    // Verify it's actually "Margarita"
+    expect(nameText?.toLowerCase()).toContain("margarita");
+
+    // Wait for ingredients section to render
+    await page.waitForTimeout(1000);
 
     // Verify ingredients label is visible
-    const ingredientsLabel = page.getByText("Ingredients:");
+    // The IngredientsLabel component renders "Ingredients:" text
+    const ingredientsLabel = page.getByText("Ingredients:", { exact: true });
     await expect(ingredientsLabel).toBeVisible({ timeout: 5000 });
 
-    // Verify instructions are displayed (if available)
-    const instructionsText = page
-      .locator("text=/mix|shake|stir|pour|add|blend/i")
-      .first();
-    const instructionsCount = await instructionsText.count();
-    if (instructionsCount > 0) {
-      await expect(instructionsText).toBeVisible();
-    }
+    // Verify ingredients legend or pie chart exists (indicating ingredients are displayed)
+    // Check for SVG (pie chart) or colored boxes (legend)
+    const hasPieChart = (await page.locator("svg").count()) > 0;
+    const hasLegend =
+      (await page.locator('div[style*="background"]').count()) > 0;
 
-    // Verify page has image
-    const image = page.locator("img").first();
-    const imageCount = await image.count();
-    expect(imageCount).toBeGreaterThan(0);
+    // At least one should be present if ingredients exist
+    expect(hasPieChart || hasLegend).toBeTruthy();
+
+    // Verify instructions are displayed
+    // Instructions should contain common cocktail preparation words
+    const instructionsContainer = page.locator(
+      "text=/mix|shake|stir|pour|add|blend|combine/i"
+    );
+    const instructionsCount = await instructionsContainer.count();
+
+    // Instructions should be present for a valid drink
+    expect(instructionsCount).toBeGreaterThan(0);
+
+    // Verify the instructions text is visible
+    if (instructionsCount > 0) {
+      await expect(instructionsContainer.first()).toBeVisible();
+    }
   });
 
   test("should handle search with query parameters", async ({ page }) => {
@@ -127,7 +142,7 @@ test.describe.skip("Search Behavior and Navigation", () => {
 
     // Verify search bar has the query value
     const searchBar = page.getByPlaceholder("Find a drink");
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(1000); // Wait for state update
     const searchValue = await searchBar.inputValue();
     expect(searchValue).toBe("margarita");
 
@@ -160,9 +175,12 @@ test.describe.skip("Search Behavior and Navigation", () => {
     for (let i = 0; i < Math.min(count, 5); i++) {
       const text = await drinkLinks.nth(i).textContent();
       if (text && text.toLowerCase().startsWith("marg")) {
-        prefixMatches.push(text);
+        prefixMatches.push(text.trim());
       }
     }
+
+    // Verify we have prefix matches
+    expect(prefixMatches.length).toBeGreaterThan(0);
 
     // Verify prefix matches are sorted alphabetically
     if (prefixMatches.length > 1) {

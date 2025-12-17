@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Ensure bun is in PATH
 export PATH="$HOME/.bun/bin:$PATH"
 

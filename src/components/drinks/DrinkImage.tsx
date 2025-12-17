@@ -32,6 +32,8 @@ export function DrinkImage({ imageUrl, drinkName }: DrinkImageProps) {
           src={imageUrl}
           alt={drinkName}
           fill
+          sizes="(max-width: 500px) 250px, 250px"
+          priority
           style={{ objectFit: "cover" }}
           unoptimized
           onError={() => {

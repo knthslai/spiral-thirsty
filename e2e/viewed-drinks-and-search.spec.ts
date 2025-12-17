@@ -55,16 +55,21 @@ test.describe("Search Bar and Viewed Drinks", () => {
     const searchBar = page.getByPlaceholder("Find a drink");
     await expect(searchBar).toBeVisible();
 
+    // Clear any existing search value first
+    await searchBar.clear();
+    await page.waitForTimeout(200);
+
     // Initially, clear button should not be visible (empty search)
     const clearButton = page.getByRole("button", { name: /clear search/i });
     await expect(clearButton).not.toBeVisible();
 
     // Type in search bar
     await searchBar.fill("margarita");
+    // Wait for state update (React state update is synchronous but DOM update might take a frame)
     await page.waitForTimeout(100);
 
     // Clear button should now be visible
-    await expect(clearButton).toBeVisible();
+    await expect(clearButton).toBeVisible({ timeout: 2000 });
   });
 
   test("should clear search input when clicking clear button", async ({
@@ -75,9 +80,13 @@ test.describe("Search Bar and Viewed Drinks", () => {
     const searchBar = page.getByPlaceholder("Find a drink");
     await expect(searchBar).toBeVisible();
 
+    // Clear any existing value first
+    await searchBar.clear();
+    await page.waitForTimeout(200);
+
     // Type in search bar
     await searchBar.fill("margarita");
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(200);
 
     // Verify search bar has text
     const searchValue = await searchBar.inputValue();
@@ -85,7 +94,7 @@ test.describe("Search Bar and Viewed Drinks", () => {
 
     // Click clear button
     const clearButton = page.getByRole("button", { name: /clear search/i });
-    await expect(clearButton).toBeVisible();
+    await expect(clearButton).toBeVisible({ timeout: 2000 });
     await clearButton.click();
 
     // Wait for state update
@@ -96,7 +105,7 @@ test.describe("Search Bar and Viewed Drinks", () => {
     expect(clearedValue).toBe("");
 
     // Clear button should be hidden again
-    await expect(clearButton).not.toBeVisible();
+    await expect(clearButton).not.toBeVisible({ timeout: 2000 });
   });
 
   test("should track viewed drinks when navigating to detail pages", async ({
@@ -110,13 +119,19 @@ test.describe("Search Bar and Viewed Drinks", () => {
     });
     await page.reload();
 
-    // Search for a drink
+    // Wait for search bar and initial results (default search might already show results)
     const searchBar = page.getByPlaceholder("Find a drink");
-    await searchBar.fill("margarita");
-    await page.waitForTimeout(2000);
+    await expect(searchBar).toBeVisible();
 
-    // Wait for results
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Results might already be loaded from default search
+    await page
+      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
+      .catch(async () => {
+        // If no results, trigger search
+        await searchBar.fill("margarita");
+        await page.waitForTimeout(2000);
+        await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+      });
 
     // Get first drink link
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
@@ -143,10 +158,10 @@ test.describe("Search Bar and Viewed Drinks", () => {
     await expect(viewedDrinksSectionLabel).toBeVisible({ timeout: 5000 });
 
     // Verify the drink we viewed is in the list
-    // Use a more specific selector - look for the drink in the viewed drinks section
+    // The drink links are in a sibling Flex, so we need to go up to the parent Box
     const viewedDrinksSection = page
       .locator("text=Recently viewed:")
-      .locator("..");
+      .locator("../.."); // Go up two levels to get the parent Box
     const viewedDrink = viewedDrinksSection
       .getByText(drinkName!.trim(), { exact: false })
       .first();
@@ -164,11 +179,17 @@ test.describe("Search Bar and Viewed Drinks", () => {
 
     // Search for drinks and view multiple ones
     const searchBar = page.getByPlaceholder("Find a drink");
-    await searchBar.fill("marg");
-    await page.waitForTimeout(2000);
+    await expect(searchBar).toBeVisible();
 
-    // Wait for results
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Results might already be loaded from default search
+    await page
+      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
+      .catch(async () => {
+        // If no results, trigger search
+        await searchBar.fill("marg");
+        await page.waitForTimeout(2000);
+        await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+      });
 
     // View 3 drinks (enough to test the feature without being too slow)
     const drinkLinks = page.locator('a[href^="/drinks/"]');
@@ -216,9 +237,10 @@ test.describe("Search Bar and Viewed Drinks", () => {
     await expect(viewedDrinksSection).toBeVisible({ timeout: 5000 });
 
     // Count the viewed drink items (they should be links)
+    // The drink links are in a sibling Flex, so we need to go up to the parent Box
     const viewedDrinkLinks = page
       .locator("text=Recently viewed:")
-      .locator("..")
+      .locator("../..") // Go up two levels to get the parent Box
       .locator('a[href^="/drinks/"]');
     const viewedCount = await viewedDrinkLinks.count();
 
@@ -249,10 +271,18 @@ test.describe("Search Bar and Viewed Drinks", () => {
 
     // View a drink
     const searchBar = page.getByPlaceholder("Find a drink");
-    await searchBar.fill("margarita");
-    await page.waitForTimeout(2000);
+    await expect(searchBar).toBeVisible();
 
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Results might already be loaded from default search
+    await page
+      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
+      .catch(async () => {
+        // If no results, trigger search
+        await searchBar.fill("margarita");
+        await page.waitForTimeout(2000);
+        await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+      });
+
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
     const drinkName = await firstDrink.textContent();
 
@@ -276,7 +306,7 @@ test.describe("Search Bar and Viewed Drinks", () => {
     if (drinkName) {
       const viewedDrinksSection = page
         .locator("text=Recently viewed:")
-        .locator("..");
+        .locator("../.."); // Go up two levels to get the parent Box
       const viewedDrink = viewedDrinksSection
         .getByText(drinkName.trim(), { exact: false })
         .first();
@@ -290,7 +320,7 @@ test.describe("Search Bar and Viewed Drinks", () => {
     // There might be multiple clear buttons, get the one near "Recently viewed"
     const clearViewedButton = page
       .locator("text=Recently viewed:")
-      .locator("..")
+      .locator("..") // Clear button is in the same Flex as "Recently viewed:"
       .getByRole("button", { name: /clear/i });
 
     await expect(clearViewedButton).toBeVisible();
@@ -332,10 +362,18 @@ test.describe("Search Bar and Viewed Drinks", () => {
 
     // View first drink
     const searchBar = page.getByPlaceholder("Find a drink");
-    await searchBar.fill("margarita");
-    await page.waitForTimeout(2000);
+    await expect(searchBar).toBeVisible();
 
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Results might already be loaded from default search
+    await page
+      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
+      .catch(async () => {
+        // If no results, trigger search
+        await searchBar.fill("margarita");
+        await page.waitForTimeout(2000);
+        await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+      });
+
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
     const firstDrinkName = await firstDrink.textContent();
 
@@ -379,7 +417,7 @@ test.describe("Search Bar and Viewed Drinks", () => {
 
     const viewedDrinkLinks = page
       .locator("text=Recently viewed:")
-      .locator("..")
+      .locator("../..") // Go up two levels to get the parent Box
       .locator('a[href^="/drinks/"]');
 
     const viewedCount = await viewedDrinkLinks.count();
@@ -405,10 +443,18 @@ test.describe("Search Bar and Viewed Drinks", () => {
 
     // View a drink
     const searchBar = page.getByPlaceholder("Find a drink");
-    await searchBar.fill("margarita");
-    await page.waitForTimeout(2000);
+    await expect(searchBar).toBeVisible();
 
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Results might already be loaded from default search
+    await page
+      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
+      .catch(async () => {
+        // If no results, trigger search
+        await searchBar.fill("margarita");
+        await page.waitForTimeout(2000);
+        await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+      });
+
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
     const drinkHref = await firstDrink.getAttribute("href");
 
@@ -431,7 +477,7 @@ test.describe("Search Bar and Viewed Drinks", () => {
     // Click on the viewed drink
     const viewedDrinkLink = page
       .locator("text=Recently viewed:")
-      .locator("..")
+      .locator("../..") // Go up two levels to get the parent Box
       .locator('a[href^="/drinks/"]')
       .first();
 

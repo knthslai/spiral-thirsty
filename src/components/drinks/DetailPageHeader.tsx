@@ -1,6 +1,6 @@
 "use client";
 
-import { Flex, Text, Box, IconButton } from "@chakra-ui/react";
+import { Flex, Text, IconButton } from "@chakra-ui/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
@@ -11,13 +11,13 @@ interface DetailPageHeaderProps {
 
 /**
  * Header component for drink detail page
- * Displays back button with "Thirsty" link and centered drink name
+ * Displays back button with "Thirsty" link above centered drink name
  */
 export function DetailPageHeader({ drinkName }: DetailPageHeaderProps) {
   const router = useRouter();
 
   return (
-    <Flex align="center" justify="space-between" mb={4} position="relative">
+    <Flex direction="column" gap={2} mb={4}>
       {/* Back button with "Thirsty" */}
       <Flex align="center">
         <IconButton
@@ -45,16 +45,13 @@ export function DetailPageHeader({ drinkName }: DetailPageHeaderProps) {
       <Text
         fontSize="lg"
         fontWeight="bold"
-        position="absolute"
-        left="50%"
-        transform="translateX(-50%)"
+        textAlign="center"
         color="gray.800"
+        maxW="100%"
+        truncate
       >
         {drinkName}
       </Text>
-
-      {/* Spacer to balance the layout */}
-      <Box w="100px" />
     </Flex>
   );
 }

@@ -99,3 +99,4 @@ function IngredientsPieChartComponent({
 
 // Memoize component to prevent re-renders when parent re-renders but props haven't changed
 export const IngredientsPieChart = memo(IngredientsPieChartComponent);
+IngredientsPieChart.displayName = "IngredientsPieChart";

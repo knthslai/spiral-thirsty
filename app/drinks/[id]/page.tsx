@@ -75,6 +75,15 @@ export default function DrinkDetailPage({ params }: DrinkDetailPageProps) {
           fontWeight="bold"
           textAlign="center"
           mt="20px"
+          mx="auto"
+          maxW="100%"
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+          }}
         >
           {drink.name}
         </Heading>

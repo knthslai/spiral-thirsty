@@ -58,7 +58,7 @@ function IngredientLegendComponent({ ingredients }: IngredientLegendProps) {
   }
 
   return (
-    <Flex wrap="wrap" gap={3}>
+    <Flex wrap="wrap" gap={3} justify={{ base: "center", md: "flex-start" }}>
       {legendItems}
     </Flex>
   );
@@ -66,3 +66,4 @@ function IngredientLegendComponent({ ingredients }: IngredientLegendProps) {
 
 // Memoize component to prevent re-renders when parent re-renders but props haven't changed
 export const IngredientLegend = memo(IngredientLegendComponent);
+IngredientLegend.displayName = "IngredientLegend";

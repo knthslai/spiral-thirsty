@@ -13,13 +13,22 @@ test.describe("Search Behavior and Navigation", () => {
     const searchBar = page.getByPlaceholder("Find a drink");
     await expect(searchBar).toBeVisible();
 
-    // Type "marg" in search bar
+    // Wait for initial results to load (default search)
+    await page
+      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
+      .catch(() => {
+        // If no results, that's okay, we'll search
+      });
+
+    // Clear and type "marg" in search bar
+    await searchBar.clear();
+    await page.waitForTimeout(100);
     await searchBar.fill("marg");
 
     // Wait for debounce (500ms) plus API call
     await page.waitForTimeout(2000);
 
-    // Wait for results to load
+    // Wait for results to load - use more flexible selector
     await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
 
     // Get all drink links
@@ -27,8 +36,8 @@ test.describe("Search Behavior and Navigation", () => {
     const count = await drinkLinks.count();
     expect(count).toBeGreaterThan(0);
 
-    // Get text content of first item
-    const firstItemText = await drinkLinks.nth(0).textContent();
+    // Get text content of first item (trim whitespace)
+    const firstItemText = (await drinkLinks.nth(0).textContent())?.trim();
 
     // First item should start with "marg" (prefix match prioritized)
     expect(firstItemText?.toLowerCase()).toMatch(/^marg/i);
@@ -38,6 +47,11 @@ test.describe("Search Behavior and Navigation", () => {
     await page.goto("/");
 
     const searchBar = page.getByPlaceholder("Find a drink");
+    await expect(searchBar).toBeVisible();
+
+    // Clear and type
+    await searchBar.clear();
+    await page.waitForTimeout(100);
     await searchBar.fill("marg");
     await page.waitForTimeout(2000);
 
@@ -60,13 +74,20 @@ test.describe("Search Behavior and Navigation", () => {
   }) => {
     await page.goto("/");
 
-    // Trigger a search
+    // Wait for initial results or trigger a search
     const searchBar = page.getByPlaceholder("Find a drink");
-    await searchBar.fill("margarita");
-    await page.waitForTimeout(2000);
+    await expect(searchBar).toBeVisible();
 
-    // Wait for results
-    await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+    // Results might already be loaded from default search
+    // Wait for results (either from default or after typing)
+    await page
+      .waitForSelector('a[href^="/drinks/"]', { timeout: 10000 })
+      .catch(async () => {
+        // If no results, trigger search
+        await searchBar.fill("margarita");
+        await page.waitForTimeout(2000);
+        await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
+      });
 
     // Get first drink link
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
@@ -89,11 +110,12 @@ test.describe("Search Behavior and Navigation", () => {
     await page.goto("/drinks/11007");
 
     // Wait for page to load - check for drink name heading
+    // Chakra UI Heading with as="h1" should render as h1
     await page.waitForSelector("h1", { timeout: 20000 });
 
     // Verify drink name is displayed and visible
     const drinkName = page.locator("h1").first();
-    await expect(drinkName).toBeVisible();
+    await expect(drinkName).toBeVisible({ timeout: 5000 });
     const nameText = await drinkName.textContent();
     expect(nameText).toBeTruthy();
     expect(nameText?.trim().length).toBeGreaterThan(0);
@@ -141,12 +163,15 @@ test.describe("Search Behavior and Navigation", () => {
     // Navigate with query parameter
     await page.goto("/?search=margarita");
 
-    // Wait for results
+    // Wait for page to load and search bar to be visible
+    const searchBar = page.getByPlaceholder("Find a drink");
+    await expect(searchBar).toBeVisible({ timeout: 5000 });
+
+    // Wait for results (query param should trigger search automatically)
     await page.waitForSelector('a[href^="/drinks/"]', { timeout: 40000 });
 
-    // Verify search bar has the query value
-    const searchBar = page.getByPlaceholder("Find a drink");
-    await page.waitForTimeout(1000); // Wait for state update
+    // Verify search bar has the query value (wait for state update)
+    await page.waitForTimeout(1000);
     const searchValue = await searchBar.inputValue();
     expect(searchValue).toBe("margarita");
 
@@ -163,6 +188,11 @@ test.describe("Search Behavior and Navigation", () => {
     await page.goto("/");
 
     const searchBar = page.getByPlaceholder("Find a drink");
+    await expect(searchBar).toBeVisible();
+
+    // Clear and type
+    await searchBar.clear();
+    await page.waitForTimeout(100);
     await searchBar.fill("marg");
     await page.waitForTimeout(2000);
 

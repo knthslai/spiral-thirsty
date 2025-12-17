@@ -17,15 +17,16 @@ export function IngredientsSection({ ingredients }: IngredientsSectionProps) {
   return (
     <Flex
       direction={{ base: "column", md: "row" }}
-      align="flex-start"
+      align={{ base: "center", md: "flex-start" }}
+      justify={{ base: "center", md: "flex-start" }}
       gap={4}
-      ml="20px"
-      mr="20px"
+      ml={{ base: "0", md: "20px" }}
+      mr={{ base: "0", md: "20px" }}
       mt="20px"
       mb="20px"
     >
       {/* Legend - left side */}
-      <Box flex="1">
+      <Box flex="1" w={{ base: "100%", md: "auto" }}>
         <IngredientLegend ingredients={ingredients} />
       </Box>
 

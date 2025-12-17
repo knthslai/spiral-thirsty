@@ -119,6 +119,7 @@ export function ViewedDrinks({ onSelectDrink }: ViewedDrinksProps) {
                     src={drink.image}
                     alt={drink.name}
                     fill
+                    sizes="(max-width: 500px) 24px, 24px"
                     style={{ objectFit: "cover" }}
                   />
                 </Box>

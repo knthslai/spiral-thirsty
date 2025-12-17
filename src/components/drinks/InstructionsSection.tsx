@@ -53,10 +53,18 @@ export function InstructionsSection({
   }
 
   return (
-    <Box ml="20px" mr="20px" mt="30px" mb="20px" maxH="400px" overflowY="auto">
+    <Box
+      ml={{ base: "0", md: "20px" }}
+      mr={{ base: "0", md: "20px" }}
+      mt="30px"
+      mb="20px"
+      maxH="400px"
+      overflowY="auto"
+      px={{ base: 4, md: 0 }}
+    >
       <Box
         as="ol"
-        pl={6}
+        pl={{ base: 4, md: 6 }}
         css={{
           listStyleType: "decimal",
           listStylePosition: "outside",

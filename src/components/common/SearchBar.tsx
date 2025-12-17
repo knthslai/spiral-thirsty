@@ -54,8 +54,7 @@ export function SearchBar({
     if (hasInitialized.current && initialValue !== searchTerm) {
       setSearchTerm(initialValue);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialValue]);
+  }, [initialValue, searchTerm]);
 
   // Keep callback ref up to date without causing re-renders
   useEffect(() => {
@@ -182,6 +181,7 @@ export function SearchBar({
             minW="20px"
             h="20px"
             p={0}
+            data-testid="clear-search-button"
           >
             <XMarkIcon width={12} height={12} />
           </IconButton>

@@ -3,21 +3,19 @@
  * All API calls are centralized here
  */
 
-import type { CocktailDBResponse, CocktailDBDrink } from '@/types/cocktail';
+import type { CocktailDBResponse, CocktailDBDrink } from "@/types/cocktail";
 
 /**
  * Base URL for TheCocktailDB API
  */
-const API_BASE_URL = 'https://www.thecocktaildb.com/api/json/v1/1';
+const API_BASE_URL = "https://www.thecocktaildb.com/api/json/v1/1";
 
 /**
  * Search for drinks by name
  * @param query - Search query string
  * @returns Promise resolving to API response with drinks array or null
  */
-export async function searchDrinks(
-  query: string
-): Promise<CocktailDBResponse> {
+export async function searchDrinks(query: string): Promise<CocktailDBResponse> {
   if (!query.trim()) {
     return { drinks: null };
   }
@@ -28,7 +26,9 @@ export async function searchDrinks(
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `API request failed: ${response.status} ${response.statusText}`
+      );
     }
 
     const data: CocktailDBResponse = await response.json();
@@ -36,7 +36,7 @@ export async function searchDrinks(
   } catch (error) {
     // Per requirements: network error handling is not required
     // Return empty response on error
-    console.error('Error fetching drinks:', error);
+    console.error("Error fetching drinks:", error);
     return { drinks: null };
   }
 }
@@ -57,7 +57,9 @@ export async function getDrinkById(id: string): Promise<CocktailDBResponse> {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `API request failed: ${response.status} ${response.statusText}`
+      );
     }
 
     const data: CocktailDBResponse = await response.json();
@@ -65,7 +67,7 @@ export async function getDrinkById(id: string): Promise<CocktailDBResponse> {
   } catch (error) {
     // Per requirements: network error handling is not required
     // Return empty response on error
-    console.error('Error fetching drink:', error);
+    console.error("Error fetching drink:", error);
     return { drinks: null };
   }
 }
@@ -82,4 +84,3 @@ export function getFirstDrink(
   }
   return response.drinks[0];
 }
-

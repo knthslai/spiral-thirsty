@@ -76,6 +76,7 @@ function DrinkListItemComponent({
               src={drink.image}
               alt={drink.name}
               fill
+              sizes="(max-width: 500px) 40px, 40px"
               style={{ objectFit: "cover" }}
               onError={handleImageError}
             />
@@ -124,3 +125,4 @@ function DrinkListItemComponent({
 
 // Memoize component to prevent re-renders when parent re-renders but props haven't changed
 export const DrinkListItem = memo(DrinkListItemComponent);
+DrinkListItem.displayName = "DrinkListItem";

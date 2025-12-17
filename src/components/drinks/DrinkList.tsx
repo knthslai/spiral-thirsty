@@ -67,3 +67,4 @@ function DrinkListComponent({
 
 // Memoize component to prevent re-renders when parent re-renders but props haven't changed
 export const DrinkList = memo(DrinkListComponent);
+DrinkList.displayName = "DrinkList";

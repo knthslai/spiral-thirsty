@@ -1,17 +1,20 @@
 # API Integration and Type Models
 
 ## Overview
+
 Set up the foundation for API integration by testing the TheCocktailDB API endpoint, creating comprehensive TypeScript type models, and implementing the API integration layer.
 
 ## Decision: Type-First Approach
 
 **Why type-first?**
+
 - Ensures type safety throughout the application
 - Separates raw API types from normalized application types
 - Makes API inconsistencies explicit and manageable
 - Provides clear contracts for data transformation layers
 
 **Architecture:**
+
 - Raw API types match exact API response structure
 - Normalized types represent clean application data
 - API functions return raw types; normalization happens in utilities (future step)
@@ -19,6 +22,7 @@ Set up the foundation for API integration by testing the TheCocktailDB API endpo
 ## Implementation Steps
 
 ### 1. API Endpoint Testing
+
 - Tested the API endpoint: `https://www.thecocktaildb.com/api/json/v1/1/search.php?s=margarita`
 - Verified response structure matches expected format
 - Confirmed ingredients are stored in numbered fields (`strIngredient1-15`, `strMeasure1-15`)
@@ -27,6 +31,7 @@ Set up the foundation for API integration by testing the TheCocktailDB API endpo
 ### 2. Type Models Created (`src/types/cocktail.ts`)
 
 #### Raw API Response Types
+
 - **`CocktailDBDrink`** - Complete type matching the API response structure
   - Includes all 15 ingredient fields (`strIngredient1-15`)
   - Includes all 15 measurement fields (`strMeasure1-15`)
@@ -38,6 +43,7 @@ Set up the foundation for API integration by testing the TheCocktailDB API endpo
   - Matches actual API behavior
 
 #### Normalized Application Types
+
 - **`Ingredient`** - Clean ingredient representation
   - `name`: string
   - `amount`: number (normalized to milliliters)
@@ -54,6 +60,7 @@ Set up the foundation for API integration by testing the TheCocktailDB API endpo
   - All metadata fields
 
 #### Helper Functions
+
 - **`hasDrinks()`** - Type guard for API responses
   - Safely checks if response contains drinks
   - Provides type narrowing for TypeScript
@@ -61,6 +68,7 @@ Set up the foundation for API integration by testing the TheCocktailDB API endpo
 ### 3. API Integration Layer (`src/lib/api.ts`)
 
 #### Functions Created
+
 - **`searchDrinks(query: string)`**
   - Searches drinks by name using `/search.php?s={query}`
   - Returns `Promise<CocktailDBResponse>`
@@ -78,6 +86,7 @@ Set up the foundation for API integration by testing the TheCocktailDB API endpo
   - Returns `null` if no drinks found
 
 #### Error Handling Philosophy
+
 - Per requirements: network error handling is NOT required
 - Functions return empty response (`{ drinks: null }`) on error
 - Errors logged to console for debugging
@@ -86,6 +95,7 @@ Set up the foundation for API integration by testing the TheCocktailDB API endpo
 ### 4. TypeScript Configuration Updates
 
 **Updated `tsconfig.json`:**
+
 - Modified path alias `@/*` to point to `./src/*`
 - Ensures imports resolve correctly with new `src/` structure
 - Maintains compatibility with Next.js App Router
@@ -103,22 +113,26 @@ src/
 ## Reasoning
 
 **Why separate raw and normalized types?**
+
 - API data structure is inconsistent and verbose
 - Normalized types provide clean interface for components
 - Clear separation between API layer and application layer
 - Makes data transformation explicit and testable
 
 **Why type guard function?**
+
 - TypeScript needs explicit type narrowing for nullable arrays
 - Makes code more readable and type-safe
 - Reusable across the application
 
 **Why helper function for first drink?**
+
 - API returns single drink in array format
 - Helper provides semantic clarity
 - Reduces repetitive null checking code
 
 **Trade-offs:**
+
 - ✅ Strong type safety throughout application
 - ✅ Clear separation of concerns
 - ✅ Easy to extend with new types

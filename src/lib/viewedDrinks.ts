@@ -3,6 +3,12 @@
  */
 
 import type { DrinkListItem } from "@/types/cocktail";
+import {
+  getStorageItem,
+  setStorageItem,
+  removeStorageItem,
+  isClient,
+} from "./storageUtils";
 
 const STORAGE_KEY = "drink-viewed-history";
 const MAX_VIEWED_ITEMS = 5;
@@ -12,21 +18,8 @@ const MAX_VIEWED_ITEMS = 5;
  * @returns Array of viewed drinks (most recent first)
  */
 export function getViewedDrinks(): DrinkListItem[] {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return [];
-    }
-    const history = JSON.parse(stored) as DrinkListItem[];
-    return Array.isArray(history) ? history : [];
-  } catch (error) {
-    console.error("Error reading viewed drinks history:", error);
-    return [];
-  }
+  const history = getStorageItem<DrinkListItem[]>(STORAGE_KEY);
+  return Array.isArray(history) ? history : [];
 }
 
 /**
@@ -35,30 +28,23 @@ export function getViewedDrinks(): DrinkListItem[] {
  * @param drink - Drink to add
  */
 export function addToViewedDrinks(drink: DrinkListItem): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
   if (!drink || !drink.id || !drink.name) {
     return;
   }
 
-  try {
-    const history = getViewedDrinks();
+  const history = getViewedDrinks();
 
-    // Remove if already exists (to move to top)
-    const filtered = history.filter((item) => item.id !== drink.id);
+  // Remove if already exists (to move to top)
+  const filtered = history.filter((item) => item.id !== drink.id);
 
-    // Add to beginning (most recent first)
-    const updated = [drink, ...filtered].slice(0, MAX_VIEWED_ITEMS);
+  // Add to beginning (most recent first)
+  const updated = [drink, ...filtered].slice(0, MAX_VIEWED_ITEMS);
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    // Dispatch custom event for same-window updates
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event("viewedDrinksUpdated"));
-    }
-  } catch (error) {
-    console.error("Error saving viewed drinks history:", error);
+  setStorageItem(STORAGE_KEY, updated);
+
+  // Dispatch custom event for same-window updates
+  if (isClient()) {
+    window.dispatchEvent(new Event("viewedDrinksUpdated"));
   }
 }
 
@@ -66,13 +52,5 @@ export function addToViewedDrinks(drink: DrinkListItem): void {
  * Clear viewed drinks history
  */
 export function clearViewedDrinks(): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (error) {
-    console.error("Error clearing viewed drinks history:", error);
-  }
+  removeStorageItem(STORAGE_KEY);
 }

@@ -1,19 +1,21 @@
-import type { Metadata } from 'next'
+import type { Metadata } from "next";
+import { Providers } from "@/components/common/Providers";
 
 export const metadata: Metadata = {
-  title: 'Spiral Thirsty',
-  description: 'Cocktail search app',
-}
+  title: "Spiral Thirsty",
+  description: "Cocktail search app",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
-  )
+  );
 }
-

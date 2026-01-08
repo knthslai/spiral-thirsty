@@ -24,21 +24,29 @@ interface IngredientsPieChartProps {
 function IngredientsPieChartComponent({
   ingredients,
 }: IngredientsPieChartProps) {
-  // Memoize color map calculation
+  // Memoize color map calculation (for all ingredients, including those without amounts)
   const colorMap = useMemo(
     () => getIngredientColorMap(ingredients.map((ing) => ing.name)),
     [ingredients]
   );
 
-  // Memoize total amount calculation
-  const totalAmount = useMemo(
-    () => ingredients.reduce((sum, ing) => sum + ing.amount, 0),
+  // Filter out ingredients without amounts (unsupported units)
+  // These should still be listed but not shown in pie chart
+  const ingredientsWithAmounts = useMemo(
+    () => ingredients.filter((ing) => ing.amount !== null && ing.amount > 0),
     [ingredients]
+  );
+
+  // Memoize total amount calculation (only for ingredients with amounts)
+  const totalAmount = useMemo(
+    () =>
+      ingredientsWithAmounts.reduce((sum, ing) => sum + (ing.amount || 0), 0),
+    [ingredientsWithAmounts]
   );
 
   // Memoize SVG paths calculation (expensive operation)
   const paths = useMemo(() => {
-    if (ingredients.length === 0 || totalAmount === 0) {
+    if (ingredientsWithAmounts.length === 0 || totalAmount === 0) {
       return [];
     }
 
@@ -47,8 +55,10 @@ function IngredientsPieChartComponent({
     const centerX = 60;
     const centerY = 60;
 
-    return ingredients.map((ingredient) => {
-      const percentage = (ingredient.amount / totalAmount) * 100;
+    return ingredientsWithAmounts.map((ingredient) => {
+      // ingredient.amount is guaranteed to be non-null here due to filtering above
+      const amount = ingredient.amount!;
+      const percentage = (amount / totalAmount) * 100;
       const angle = (percentage / 100) * 360;
       const color = colorMap.get(ingredient.name) || "#cccccc";
 
@@ -82,9 +92,9 @@ function IngredientsPieChartComponent({
         />
       );
     });
-  }, [ingredients, totalAmount, colorMap]);
+  }, [ingredientsWithAmounts, totalAmount, colorMap]);
 
-  if (ingredients.length === 0 || totalAmount === 0) {
+  if (ingredientsWithAmounts.length === 0 || totalAmount === 0) {
     return null;
   }
 

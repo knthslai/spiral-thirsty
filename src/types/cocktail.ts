@@ -81,11 +81,13 @@ export interface CocktailDBResponse {
 /**
  * Normalized ingredient with converted measurements
  * All amounts are normalized to milliliters (ml)
+ * Amount is optional - ingredients without supported units will have null amount
+ * and won't appear in the pie chart, but will still be listed
  */
 export interface Ingredient {
   name: string;
-  amount: number; // Amount in milliliters
-  unit: "ml";
+  amount: number | null; // Amount in milliliters, null if unit is unsupported
+  unit: "ml" | null; // Unit is null if amount is null
   originalMeasure: string | null; // Original measurement string from API for display
 }
 

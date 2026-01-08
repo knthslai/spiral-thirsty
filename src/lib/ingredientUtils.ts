@@ -40,10 +40,15 @@ const UNIT_PATTERNS = Object.keys(CONVERSION_TO_ML)
 
 /**
  * Regex to extract number and unit from measurement string
- * Matches patterns like "1 oz", "1/2 cup", "2.5 tsp", etc.
+ * Matches patterns like "1 oz", "1/2 cup", "2.5 tsp", "1 2/3 oz", etc.
+ * Handles:
+ * - Whole numbers: "1"
+ * - Decimals: "1.5"
+ * - Simple fractions: "1/2", "1 / 2"
+ * - Mixed fractions: "1 2/3", "1 2 / 3"
  */
 const MEASUREMENT_REGEX = new RegExp(
-  `^(\\d+(?:\\.\\d+)?(?:\\s*\\/\\s*\\d+)?)\\s*(${UNIT_PATTERNS})(?:s)?\\s*$`,
+  `^((?:\\d+\\s+)?\\d+\\s*\\/\\s*\\d+|\\d+(?:\\.\\d+)?)\\s*(${UNIT_PATTERNS})(?:s)?\\s*$`,
   "i"
 );
 
@@ -90,16 +95,36 @@ export function parseMeasurementToMl(measureStr: string | null): number | null {
     const amountStr = match[1];
     const unit = match[2].toLowerCase();
 
-    // Parse amount (could be fraction or decimal)
+    // Parse amount (could be fraction, mixed fraction, or decimal)
     let amount: number;
 
     if (amountStr.includes("/")) {
-      const fraction = parseFraction(amountStr);
-      if (fraction === null) {
+      // Normalize spaces around slash: "1 / 2" -> "1/2", "1 2 / 3" -> "1 2/3"
+      const normalized = amountStr.replace(/\s*\/\s*/, "/").trim();
+      const parts = normalized.split(/\s+/);
+
+      if (parts.length === 1) {
+        // Simple fraction: "1/2"
+        const fraction = parseFraction(parts[0]);
+        if (fraction === null) {
+          return null;
+        }
+        amount = fraction;
+      } else if (parts.length === 2) {
+        // Mixed fraction: "1 2/3"
+        const wholePart = parseFloat(parts[0]);
+        const fraction = parseFraction(parts[1]);
+
+        if (isNaN(wholePart) || fraction === null) {
+          return null;
+        }
+        amount = wholePart + fraction;
+      } else {
+        // Invalid format
         return null;
       }
-      amount = fraction;
     } else {
+      // Decimal or whole number: "1.5" or "1"
       amount = parseFloat(amountStr);
       if (isNaN(amount)) {
         return null;
@@ -150,16 +175,15 @@ export function normalizeIngredients(drink: CocktailDBDrink): Ingredient[] {
     // Try to parse measurement
     const amountMl = parseMeasurementToMl(measureStr);
 
-    // Only include if we successfully parsed the measurement
+    // Include all ingredients, but only those with supported units will have amounts
     // Per spec: "If an ingredient doesn't match one of your supported units, don't display it in the pie chart"
-    if (amountMl !== null && amountMl > 0) {
-      ingredients.push({
-        name: ingredientName.trim(),
-        amount: amountMl,
-        unit: "ml",
-        originalMeasure: measureStr ? measureStr.trim() : null,
-      });
-    }
+    // But they should still be listed in the ingredient legend
+    ingredients.push({
+      name: ingredientName.trim(),
+      amount: amountMl !== null && amountMl > 0 ? amountMl : null,
+      unit: amountMl !== null && amountMl > 0 ? "ml" : null,
+      originalMeasure: measureStr ? measureStr.trim() : null,
+    });
   }
 
   return ingredients;

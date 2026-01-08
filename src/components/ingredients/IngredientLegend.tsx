@@ -28,10 +28,16 @@ function IngredientLegendComponent({ ingredients }: IngredientLegendProps) {
     [ingredients]
   );
 
-  // Memoize list items
+  // Filter to only show ingredients with amounts (those in pie chart)
+  const supportedIngredients = useMemo(
+    () => ingredients.filter((ing) => ing.amount !== null && ing.amount > 0),
+    [ingredients]
+  );
+
+  // Memoize list items (only for supported ingredients)
   const legendItems = useMemo(
     () =>
-      ingredients.map((ingredient) => {
+      supportedIngredients.map((ingredient) => {
         const color = colorMap.get(ingredient.name);
         const displayText = ingredient.originalMeasure
           ? `${ingredient.name} (${ingredient.originalMeasure})`
@@ -50,10 +56,10 @@ function IngredientLegendComponent({ ingredients }: IngredientLegendProps) {
           </Flex>
         );
       }),
-    [ingredients, colorMap]
+    [supportedIngredients, colorMap]
   );
 
-  if (ingredients.length === 0) {
+  if (supportedIngredients.length === 0) {
     return null;
   }
 

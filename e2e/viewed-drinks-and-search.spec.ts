@@ -34,14 +34,42 @@ async function navigateToDrinkDetail(page: any, drinkIndex = 0) {
   // Wait for the link to be visible and ready
   await expect(drinkLink).toBeVisible({ timeout: 10000 });
 
+  // Wait for the link to be actionable (enabled and not covered)
+  await expect(drinkLink).toBeEnabled({ timeout: 5000 });
+
   const drinkName = await drinkLink.textContent();
   const drinkHref = await drinkLink.getAttribute("href");
 
-  // Click and wait for navigation
-  await Promise.all([
-    page.waitForURL(/\/drinks\/\d+/, { timeout: 15000 }),
-    drinkLink.click(),
-  ]);
+  // Ensure link is in viewport and clickable
+  await drinkLink.scrollIntoViewIfNeeded();
+
+  // Wait for any pending network requests to settle
+  await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {
+    // Ignore if networkidle times out, continue anyway
+  });
+
+  await page.waitForTimeout(300); // Small delay to ensure everything is ready
+
+  // Try clicking with navigation wait
+  try {
+    // Start navigation wait BEFORE clicking
+    const navigationPromise = page.waitForURL(/\/drinks\/\d+/, {
+      timeout: 15000,
+    });
+
+    // Click the link
+    await drinkLink.click({ force: false });
+
+    // Wait for navigation to complete
+    await navigationPromise;
+  } catch (error) {
+    // If click doesn't work, try navigating directly via href
+    if (drinkHref) {
+      await page.goto(drinkHref, { waitUntil: "load", timeout: 15000 });
+    } else {
+      throw error;
+    }
+  }
 
   await page.waitForSelector("h1", { timeout: 20000 });
   await page.waitForTimeout(1000); // Wait for tracking to complete

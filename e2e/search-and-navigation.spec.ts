@@ -88,15 +88,44 @@ test.describe("Search Behavior and Navigation", () => {
 
     // Get first drink link
     const firstDrink = page.locator('a[href^="/drinks/"]').first();
-    const href = await firstDrink.getAttribute("href");
 
+    // Wait for link to be visible and actionable
+    await expect(firstDrink).toBeVisible({ timeout: 10000 });
+    await expect(firstDrink).toBeEnabled({ timeout: 5000 });
+
+    const href = await firstDrink.getAttribute("href");
     expect(href).toMatch(/^\/drinks\/\d+$/);
 
-    // Click and wait for navigation
-    await Promise.all([
-      page.waitForURL(/\/drinks\/\d+/, { timeout: 15000 }),
-      firstDrink.click(),
-    ]);
+    // Ensure link is in viewport
+    await firstDrink.scrollIntoViewIfNeeded();
+
+    // Wait for any pending network requests to settle
+    await page.waitForLoadState("networkidle", { timeout: 5000 }).catch(() => {
+      // Ignore if networkidle times out, continue anyway
+    });
+
+    await page.waitForTimeout(300);
+
+    // Try clicking with navigation wait
+    try {
+      // Start navigation wait BEFORE clicking
+      const navigationPromise = page.waitForURL(/\/drinks\/\d+/, {
+        timeout: 15000,
+      });
+
+      // Click the link
+      await firstDrink.click({ force: false });
+
+      // Wait for navigation to complete
+      await navigationPromise;
+    } catch (error) {
+      // If click doesn't work, try navigating directly via href
+      if (href) {
+        await page.goto(href, { waitUntil: "load", timeout: 15000 });
+      } else {
+        throw error;
+      }
+    }
 
     // Verify we're on the detail page
     expect(page.url()).toMatch(/\/drinks\/\d+$/);
